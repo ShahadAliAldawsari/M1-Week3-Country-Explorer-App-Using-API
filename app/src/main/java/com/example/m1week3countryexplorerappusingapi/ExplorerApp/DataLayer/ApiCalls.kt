@@ -45,7 +45,10 @@ fun statesApiCall(countryCode3: String): List<State> {
         try {
             val response = apiService.getCountryStates(countryCode3)
             if (!response.error) {
-                states = response.data
+                states = response.data.states
+            }else{
+                Log.e(TAG, "response.error = ${response.error}\n+" +
+                        "response.msg = ${response.msg}")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error in statesApiCall: ${e.message}")
@@ -56,10 +59,10 @@ fun statesApiCall(countryCode3: String): List<State> {
 
 
 @Composable
-fun citiesApiCall(stateCode3: String): List<Cities> {
+fun citiesApiCall(stateCode3: String): List<City> {
     val apiService = RetrofitInstance.getApiService()
     var cities by remember {
-        mutableStateOf(emptyList<Cities>())
+        mutableStateOf(emptyList<City>())
     }
 
     LaunchedEffect(Unit) {

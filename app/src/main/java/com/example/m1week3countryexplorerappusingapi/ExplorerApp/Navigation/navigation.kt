@@ -1,4 +1,4 @@
-package com.example.m1week3countryexplorerappusingapi.ExplorerApp.PresentationLayer.Navigation
+package com.example.m1week3countryexplorerappusingapi.ExplorerApp.Navigation
 
 import android.annotation.SuppressLint
 import android.util.Log

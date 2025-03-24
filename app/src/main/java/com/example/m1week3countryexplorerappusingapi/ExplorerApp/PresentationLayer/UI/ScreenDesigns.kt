@@ -3,7 +3,6 @@
 package com.example.m1week3countryexplorerappusingapi.ExplorerApp.PresentationLayer.UI
 
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -38,10 +37,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight.Companion.SemiBold
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.m1week3countryexplorerappusingapi.ExplorerApp.DataLayer.Cities
+import com.example.m1week3countryexplorerappusingapi.ExplorerApp.DataLayer.City
 import com.example.m1week3countryexplorerappusingapi.ExplorerApp.DataLayer.Country
 import com.example.m1week3countryexplorerappusingapi.ExplorerApp.DataLayer.State
-import com.example.m1week3countryexplorerappusingapi.ExplorerApp.PresentationLayer.Navigation.citiesNavScree
+import com.example.m1week3countryexplorerappusingapi.ExplorerApp.Navigation.CitiesNavScreen
+import com.example.m1week3countryexplorerappusingapi.ExplorerApp.Navigation.StatesNavScreen
 import com.example.m1week3countryexplorerappusingapi.R
 
 
@@ -50,10 +50,12 @@ import com.example.m1week3countryexplorerappusingapi.R
 @Composable
 fun TopBar(
     /*scrollBehavior: TopAppBarScrollBehavior,*/
-    isDark: MutableState<Boolean>,title: String){
+    isDark: MutableState<Boolean>, title: String
+) {
     TopAppBar(
 //        scrollBehavior = scrollBehavior,
-        colors = TopAppBarDefaults.topAppBarColors(MaterialTheme.colorScheme.primaryContainer,
+        colors = TopAppBarDefaults.topAppBarColors(
+            MaterialTheme.colorScheme.primaryContainer,
         ),
         title = {
             Text(
@@ -87,8 +89,8 @@ fun TopBar(
                 contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.buttonColors(Color.Transparent)
 
-            ){
-                val screenModeIcon = if(isDark.value) R.drawable.sun else R.drawable.moon
+            ) {
+                val screenModeIcon = if (isDark.value) R.drawable.sun else R.drawable.moon
                 Icon(
                     painter = painterResource(id = screenModeIcon),
                     contentDescription = "search icon",
@@ -104,45 +106,42 @@ fun TopBar(
 }
 
 @Composable
-fun Item(name:String, code3:String? , navCtrl: NavHostController){
+fun Item(name: String, code3: String?, onNavigation: () -> Unit) {
     Button(
         modifier = Modifier
             .padding(0.dp)
             .background(Color.Transparent)
             .fillMaxWidth(),
         onClick = {
-            if (code3 != null) {
-                navCtrl.navigate("citiesNavScree/$code3")
-            }
-        }
+            onNavigation()
+        },
+        colors = ButtonDefaults.buttonColors(Color.Transparent)
     ) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentSize(Alignment.Center)
-                .padding(16.dp, 8.dp, 16.dp, 8.dp),
+                .padding(16.dp, 4.dp, 16.dp, 4.dp),
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primaryContainer),
         ) {
-            Row {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
 
                 Text(
                     text = name,
                     modifier = Modifier
-                        .fillMaxWidth()
                         .padding(8.dp),
                     style = MaterialTheme.typography.titleLarge,
                     fontFamily = FontFamily.Serif,
-
                     )
 
-                Spacer(Modifier.width(8.dp))
-
+                Spacer(Modifier.width(4.dp))
 
                 if (code3 != null) {
                     Text(
                         text = code3,
                         modifier = Modifier
-                            .fillMaxWidth()
                             .wrapContentSize(Alignment.Center)
                             .padding(8.dp),
                         style = MaterialTheme.typography.titleLarge,
@@ -156,75 +155,84 @@ fun Item(name:String, code3:String? , navCtrl: NavHostController){
 
 
 @Composable
-fun CountriesScreen(title: String, countries: List<Country>,
-               isDark: MutableState<Boolean>, navCtrl: NavHostController){
-    Scaffold (
-        topBar={
+fun CountriesScreen(
+    title: String, countries: List<Country>,
+    isDark: MutableState<Boolean>, navCtrl: NavHostController
+) {
+    Scaffold(
+        topBar = {
             TopBar(
                 title = title,
-                isDark=isDark
+                isDark = isDark
             )
         }
     )
-    {
-        topPaddingValue ->
+    { topPaddingValue ->
         LazyColumn(
             modifier = Modifier
                 .padding(top = topPaddingValue.calculateTopPadding() + 8.dp)
                 .fillMaxWidth()
         ) {
             items(items = countries) { country ->
-                Item(name = country.countryName.toString(), code3 = country.countryCode3, navCtrl)
+                Item(name = country.countryName, code3 = country.countryCode3, onNavigation = {
+                    navCtrl.navigate(StatesNavScreen(countryCode3 = country.countryCode3))
+                })
             }
         }
     }
 }
 
 @Composable
-fun StatesScreen(title: String, states: List<State>, countryCode3:String,
-                 isDark: MutableState<Boolean>, navCtrl: NavHostController){
-    Scaffold (
-        topBar={
+fun StatesScreen(
+    title: String, states: List<State>,
+    isDark: MutableState<Boolean>, navCtrl: NavHostController
+) {
+    Scaffold(
+        topBar = {
             TopBar(
                 title = title,
-                isDark=isDark
+                isDark = isDark
             )
         }
     )
-    {
-        topPaddingValue ->
+    { topPaddingValue ->
         LazyColumn(
             modifier = Modifier
                 .padding(top = topPaddingValue.calculateTopPadding() + 8.dp)
                 .fillMaxWidth()
         ) {
             items(items = states) { state ->
-                Item(name = state.stateName, code3 = state.stateCode3, navCtrl)
+                Item(name = state.stateName.toString(), code3 = state.stateCode3.toString(), onNavigation = {
+                    navCtrl.navigate(CitiesNavScreen(stateCode3 = state.stateCode3.toString()))
+                })
             }
         }
     }
 }
 
 @Composable
-fun CitiesScreen(title: String, cities: List<Cities>, stateCode3:String,
-                 isDark: MutableState<Boolean>, navCtrl: NavHostController){
-    Scaffold (
-        topBar={
+fun CitiesScreen(
+    title: String, cities: List<City>,
+    isDark: MutableState<Boolean>, navCtrl: NavHostController
+) {
+    Scaffold(
+        topBar = {
             TopBar(
                 title = title,
-                isDark=isDark
+                isDark = isDark
             )
         }
     )
-    {
-            topPaddingValue ->
+    { topPaddingValue ->
         LazyColumn(
             modifier = Modifier
                 .padding(top = topPaddingValue.calculateTopPadding() + 8.dp)
                 .fillMaxWidth()
         ) {
             items(items = cities) { city ->
-                Item(name = city.toString(), code3 = stateCode3, navCtrl)
+                Item(name = city.toString(), code3 = null, onNavigation = {
+                    navCtrl.navigate(CitiesNavScreen(stateCode3 = null.toString()))
+                })
             }
         }
     }

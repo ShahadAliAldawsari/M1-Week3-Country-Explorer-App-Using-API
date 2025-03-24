@@ -20,26 +20,8 @@ object RetrofitInstance{
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient)
                 .build()
-
         }
         return instance
     }
     fun getApiService(): ApiService = getInstance().create(ApiService::class.java)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
